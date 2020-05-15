@@ -71,6 +71,28 @@ app.get('/index', (req, res)=>{
 	}
 	
 });
+app.get('/contest-page/:ids', (req, res)=>{
+	var ids = req.params.ids;
+	if (req.session.loggedin) {
+		conn.query('SELECT * FROM tasks', function(error, results) {
+			
+			if (results.length > 0) {
+				req.session.tasks = results;
+			}
+			res.render('contest-page', {
+				username: req.session.username,
+				contestid: ids,
+				idaccount: req.session.idaccount,
+				tasks: req.session.tasks
+			});
+		});
+		
+	} else {
+		// res.send('Please login to view this page!');
+		res.render('login');
+	}
+	
+});
 app.post('/exit', function(req, res){
 	req.session.destroy();
 	res.redirect('/');
