@@ -46,10 +46,32 @@ app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'ejs');//
 app.set('views', './views');//указание директории с доступными страницами
 app.get('/', (req, res)=>{
-	res.render('login');
+	if (req.session.loggedin) {
+		// res.send('Welcome back, ' + req.session.username + '!');
+		res.redirect('index');
+	}
+	else res.render('login');
 });
 app.get('/index', (req, res)=>{
-	res.render('index');
+	if (req.session.loggedin) {
+		// res.send('Welcome back, ' + req.session.username + '!');
+		res.render('index');
+	} else {
+		res.send('Please login to view this page!');
+	}
+	
+});
+// app.get('/home', function(request, response) {
+// 	if (request.session.loggedin) {
+// 		response.send('Welcome back, ' + request.session.username + '!');
+// 	} else {
+// 		response.send('Please login to view this page!');
+// 	}
+// 	response.end();
+// });
+app.post('/exit', function(req, res){
+	req.session.destroy();
+	res.redirect('/');
 });
 app.post('/auth', function(request, response) {
 	var username = request.body.username;
@@ -70,14 +92,7 @@ app.post('/auth', function(request, response) {
 		response.end();
 	}
 });
-app.get('/home', function(request, response) {
-	if (request.session.loggedin) {
-		response.send('Welcome back, ' + request.session.username + '!');
-	} else {
-		response.send('Please login to view this page!');
-	}
-	response.end();
-});
+
 
 io.on('connection', function(socket) {
 	console.log('client add');
