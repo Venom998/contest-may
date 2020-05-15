@@ -47,28 +47,30 @@ app.set('view engine', 'ejs');//
 app.set('views', './views');//указание директории с доступными страницами
 app.get('/', (req, res)=>{
 	if (req.session.loggedin) {
-		// res.send('Welcome back, ' + req.session.username + '!');
 		res.redirect('index');
 	}
 	else res.render('login');
 });
 app.get('/index', (req, res)=>{
 	if (req.session.loggedin) {
-		// res.send('Welcome back, ' + req.session.username + '!');
-		res.render('index');
+		conn.query('SELECT * FROM tasks', function(error, results) {
+			
+			if (results.length > 0) {
+				req.session.tasks = results;
+			}
+			res.render('index', {
+				username: req.session.username,
+				idaccount: req.session.idaccount,
+				tasks: req.session.tasks
+			});
+		});
+		
 	} else {
-		res.send('Please login to view this page!');
+		// res.send('Please login to view this page!');
+		res.render('login');
 	}
 	
 });
-// app.get('/home', function(request, response) {
-// 	if (request.session.loggedin) {
-// 		response.send('Welcome back, ' + request.session.username + '!');
-// 	} else {
-// 		response.send('Please login to view this page!');
-// 	}
-// 	response.end();
-// });
 app.post('/exit', function(req, res){
 	req.session.destroy();
 	res.redirect('/');
@@ -79,11 +81,15 @@ app.post('/auth', function(request, response) {
 	if (username && password) {
 		conn.query('SELECT * FROM accounts WHERE username = ? AND password = ? LIMIT 1', [username, password], function(error, results, fields) {
 			if (results.length > 0) {
+				// console.log(results);
+				// console.log(results[0].id);
 				request.session.loggedin = true;
 				request.session.username = username;
+				request.session.idaccount = results[0].id;
 				response.redirect('index');
 			} else {
-				response.send('Incorrect Username and/or Password!');
+				// response.send('Incorrect Username and/or Password!');
+				res.render('login');
 			}			
 			response.end();
 		});
