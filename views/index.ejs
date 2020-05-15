@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Диплом</title>
+	<link rel="stylesheet" href="../css/main.css" type="text/css">
+	<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+	<script src="socket.io/socket.io.js"></script>
+</head>
+<body>
+	<h1>Динамический анализатор кода</h1>
+	<p>Выберите файл</p>
+	<input type="text" name="field1">
+	<input type="file" name="my_file"><br><br>
+	<textarea name="mainarea" id="txtarea" cols="100" rows="20" ></textarea><br><br>
+	<button class="btn" type="submit">Send</button>
+</body>
+	<script>
+		var socket = io();
+		$('.btn').click(function(){
+			socket.emit('txt', $('#txtarea').val());
+		});
+	</script>
+</html>
